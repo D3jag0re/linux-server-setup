@@ -61,7 +61,10 @@ After completing this project, you will have learned how to secure a Linux serve
 
 ## Notes 
 
-- (blank)
+- Going to use ed25519 instead of previously used rsa keys
+- ssh-keygen -t ed25519 -C "your_email@example.com" 
+    - -C is just a label
+- Stored in GH Secrets as per prereq 
 
 ## Lessons Learned
 
