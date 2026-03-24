@@ -1,0 +1,60 @@
+name: Build > Deploy
+
+# [] Build droplet 
+# [] Install Ansible 
+# [ ] Run Playbook 
+
+on:
+    push:
+      branches: [doom]
+    workflow_dispatch: # Trigger manually from the Actions tab      
+
+jobs:
+ build_droplet:
+   runs-on: ubuntu-latest
+   outputs:
+    id: ${{ steps.dropletOutputs.outputs.id}}
+    ipv4: ${{ steps.dropletOutputs.outputs.ipv4}}
+    name: ${{ steps.dropletOutputs.outputs.name}}
+
+   steps:
+     - name: Checkout repository
+       uses: actions/checkout@v4
+        
+     - name: Install Terraform
+       uses: hashicorp/setup-terraform@v3
+       with:
+        terraform_version: 1.10.2
+    
+     - name: Set D_O S3Var
+       run: |
+        echo "AWS_ACCESS_KEY_ID=${{ secrets.DO_SPACES_ACCESS_KEY }}" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=${{ secrets.DO_SPACES_SECRET_KEY }}" >> $GITHUB_ENV
+       
+     - name: Terraform Init
+       run: terraform init
+       working-directory: ./terraform
+       env:
+        DO_TOKEN: ${{ secrets.DO_TOKEN }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.DO_SPACES_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.DO_SPACES_SECRET_KEY }}
+
+     - name: Terraform Apply
+       id: apply
+       run: |
+         terraform apply -auto-approve \
+          -var "do_token=${{ secrets.DO_TOKEN }}" \
+          -var "public_key=${{ secrets.DO_SSH_PUBLIC_KEY }}"
+       working-directory: ./terraform
+       env:
+        DO_TOKEN: ${{ secrets.DO_TOKEN }}
+      
+     - name: Get Droplet Outputs
+       id: dropletOutputs
+       run: |
+        DROPLET_INFO=$(terraform output -json droplet_info)
+        echo "id=$(echo $DROPLET_INFO | jq -r '.id')" >> $GITHUB_OUTPUT
+        echo "ipv4=$(echo $DROPLET_INFO | jq -r '.ipv4')" >> $GITHUB_OUTPUT
+        echo "name=$(echo $DROPLET_INFO | jq -r '.name')" >> $GITHUB_OUTPUT
+       working-directory: ./terraform  
+
