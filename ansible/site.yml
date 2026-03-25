@@ -1,0 +1,11 @@
+---
+- name: Configure Linux server
+  hosts: linux
+  become: true
+  roles:
+    - role: common
+    - role: users
+    - role: ssh
+    - role: firewall
+    - role: fail2ban
+    - role: verification

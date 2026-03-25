@@ -1,0 +1,16 @@
+---
+server_timezone: America/Toronto
+server_hostname: web-lss
+
+admin_user: doomguy
+admin_user_groups:
+  - sudo
+
+ssh_public_key: ""
+ssh_disable_password_auth: true
+ssh_disable_root_login: true
+
+ufw_allowed_tcp_ports:
+  - 22
+
+fail2ban_sshd_enabled: true

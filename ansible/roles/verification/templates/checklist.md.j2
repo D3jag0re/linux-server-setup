@@ -1,0 +1,16 @@
+# Linux Server Setup Verification
+
+- Hostname: {{ server_hostname }}
+- Timezone: {{ server_timezone }}
+- SSH service enabled: {{ ssh_enabled.stdout }}
+- unattended-upgrades enabled: {{ unattended_enabled.stdout }}
+- UFW status:
+{{ ufw_status.stdout }}
+
+- Fail2Ban sshd:
+{{ fail2ban_sshd_status.stdout }}
+
+- Common log locations:
+  - /var/log/auth.log
+  - /var/log/syslog
+  - /var/log/fail2ban.log
