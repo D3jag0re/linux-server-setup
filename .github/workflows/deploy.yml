@@ -138,13 +138,13 @@ jobs:
 
       - name: Run Ansible playbook
         run: |
-          ./scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" root > ansible/inventories/github-actions/hosts.yml
+          ../scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" root > inventories/github-actions/hosts.yml
           if ! ansible-playbook \
             -i inventories/github-actions/hosts.yml \
             site.yml \
             --private-key ~/.ssh/do_key \
             -e "ssh_public_key_file=/home/runner/.ssh/do_key.pub"; then
-            ./scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" doomguy > ansible/inventories/github-actions/hosts.yml
+            ../scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" doomguy > inventories/github-actions/hosts.yml
             ansible-playbook \
               -i inventories/github-actions/hosts.yml \
               site.yml \
