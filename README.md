@@ -64,8 +64,27 @@ After completing this project, you will have learned how to secure a Linux serve
 - Going to use ed25519 instead of previously used rsa keys
 - ssh-keygen -t ed25519 -C "your_email@example.com" 
     - -C is just a label
-- Stored in GH Secrets as per prereq 
+- Stored in GH Secrets as per prereq
+
+- Going to implement some things I have not before i nthese projects, such as running validations beforehand (vs the YOLO approach), and verify. 
+
+- Splitting up Ansible into much smaller chunks. Previously would have roles seperates but with one .yml file per role. With this approach, I will utilize the following: 
+    - `tasks/` Logic / What to Do
+    - `defaults/` Config / Configurable Values
+    - `handlers/` Handlers / Conditional Reactions
+    - `templates/` Output Rendering / Dynamic File Generation
 
 ## Lessons Learned
 
 - (blank)
+
+## GitHub Actions Flow
+
+This repository uses a simple GitHub Actions pipeline to provision and configure the server in ordered stages:
+
+- `build`: runs lightweight checks before any infrastructure changes. This includes Terraform format and validate checks plus an Ansible syntax check.
+- `deploy`: runs Terraform to create or update the DigitalOcean droplet and captures the droplet IP as a workflow output.
+- `config`: waits for SSH to become available, builds a temporary Ansible inventory from the Terraform output, and applies the Ansible playbook to configure the server.
+- `verify`: reconnects to the configured server as the non-root admin user and runs a lightweight verification playbook to confirm SSH, UFW, unattended upgrades, Fail2Ban, and log inspection checks.
+
+At a high level, Terraform is responsible for provisioning the droplet and Ansible is responsible for configuring and validating the operating system after the server is reachable.

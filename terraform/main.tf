@@ -29,8 +29,8 @@ resource "digitalocean_droplet" "web" {
 # Capture outputs of droplet
 output "droplet_info" {
   value = {
-    id       = digitalocean_droplet.web.id
-    name     = digitalocean_droplet.web.name
-    ipv4     = digitalocean_droplet.web.ipv4_address
+    id   = digitalocean_droplet.web.id
+    name = digitalocean_droplet.web.name
+    ipv4 = digitalocean_droplet.web.ipv4_address
   }
 }

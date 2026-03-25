@@ -1,0 +1,6 @@
+---
+- name: Verify Linux server configuration
+  hosts: linux
+  become: true
+  roles:
+    - role: verification
