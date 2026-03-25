@@ -11,9 +11,9 @@
 - name: Install authorized key for admin user
   ansible.posix.authorized_key:
     user: "{{ admin_user }}"
-    key: "{{ ssh_public_key }}"
+    key: "{{ lookup('ansible.builtin.file', ssh_public_key_file) if (ssh_public_key_file | length > 0) else ssh_public_key }}"
     state: present
-  when: ssh_public_key | length > 0
+  when: (ssh_public_key | length > 0) or (ssh_public_key_file | length > 0)
 
 - name: Allow passwordless sudo for admin user
   ansible.builtin.copy:

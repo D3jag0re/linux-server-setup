@@ -129,7 +129,9 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.DO_SSH_PRIVATE_KEY_PRIVATE }}" > ~/.ssh/do_key
+          printf '%s\n' "${{ secrets.DO_SSH_PUBLIC_KEY_PRIVATE }}" > ~/.ssh/do_key.pub
           chmod 600 ~/.ssh/do_key
+          chmod 644 ~/.ssh/do_key.pub
 
       - name: Make helper scripts executable
         run: chmod +x scripts/render_inventory.sh scripts/wait_for_ssh.sh
@@ -146,7 +148,7 @@ jobs:
             -i inventories/github-actions/hosts.yml \
             site.yml \
             --private-key ~/.ssh/do_key \
-            -e "ssh_public_key=${{ secrets.DO_SSH_PUBLIC_KEY_PRIVATE }}"
+            -e "ssh_public_key_file=/home/runner/.ssh/do_key.pub"
         working-directory: ./ansible
 
   verify:
