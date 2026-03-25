@@ -2,5 +2,10 @@
 - name: Verify Linux server configuration
   hosts: linux
   become: true
+  pre_tasks:
+    - name: Wait for SSH connection
+      ansible.builtin.wait_for_connection:
+        timeout: 120
+        sleep: 5
   roles:
     - role: verification

@@ -2,6 +2,11 @@
 - name: Configure Linux server
   hosts: linux
   become: true
+  pre_tasks:
+    - name: Wait for SSH connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+        sleep: 5
   roles:
     - role: common
     - role: users

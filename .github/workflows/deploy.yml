@@ -109,8 +109,6 @@ jobs:
   config:
     runs-on: ubuntu-latest
     needs: deploy
-    outputs:
-      ssh_user: ${{ steps.detect_ssh_user.outputs.ssh_user }}
 
     steps:
       - name: Checkout repository
@@ -136,28 +134,23 @@ jobs:
           chmod 644 ~/.ssh/do_key.pub
 
       - name: Make helper scripts executable
-        run: chmod +x scripts/render_inventory.sh scripts/wait_for_ssh.sh
-
-      - name: Detect SSH user
-        id: detect_ssh_user
-        run: |
-          if ./scripts/wait_for_ssh.sh "${{ needs.deploy.outputs.ipv4 }}" root ~/.ssh/do_key 60; then
-            echo "ssh_user=root" >> "$GITHUB_OUTPUT"
-          else
-            ./scripts/wait_for_ssh.sh "${{ needs.deploy.outputs.ipv4 }}" doomguy ~/.ssh/do_key
-            echo "ssh_user=doomguy" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Render GitHub Actions inventory
-        run: ./scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" "${{ steps.detect_ssh_user.outputs.ssh_user }}" > ansible/inventories/github-actions/hosts.yml
+        run: chmod +x scripts/render_inventory.sh
 
       - name: Run Ansible playbook
         run: |
-          ansible-playbook \
+          ./scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" root > ansible/inventories/github-actions/hosts.yml
+          if ! ansible-playbook \
             -i inventories/github-actions/hosts.yml \
             site.yml \
             --private-key ~/.ssh/do_key \
-            -e "ssh_public_key_file=/home/runner/.ssh/do_key.pub"
+            -e "ssh_public_key_file=/home/runner/.ssh/do_key.pub"; then
+            ./scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" doomguy > ansible/inventories/github-actions/hosts.yml
+            ansible-playbook \
+              -i inventories/github-actions/hosts.yml \
+              site.yml \
+              --private-key ~/.ssh/do_key \
+              -e "ssh_public_key_file=/home/runner/.ssh/do_key.pub"
+          fi
         working-directory: ./ansible
 
   verify:
