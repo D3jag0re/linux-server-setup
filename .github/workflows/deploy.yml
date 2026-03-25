@@ -135,7 +135,7 @@ jobs:
         run: chmod +x scripts/render_inventory.sh scripts/wait_for_ssh.sh
 
       - name: Wait for SSH
-        run: ./scripts/wait_for_ssh.sh "${{ needs.deploy.outputs.ipv4 }}"
+        run: ./scripts/wait_for_ssh.sh "${{ needs.deploy.outputs.ipv4 }}" root ~/.ssh/do_key
 
       - name: Render GitHub Actions inventory
         run: ./scripts/render_inventory.sh "${{ needs.deploy.outputs.ipv4 }}" root > ansible/inventories/github-actions/hosts.yml
