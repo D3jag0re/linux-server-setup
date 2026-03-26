@@ -78,6 +78,8 @@ After completing this project, you will have learned how to secure a Linux serve
 
 - One main issue was the ssh access check would time out once everything was working. Why? Because it used 'root' to check when 'root's ssh access gets removed later in the ansible playbook. This would also affect future changes to an existing system. Therefore implemented a `detect ssh user` step' that tries root first (for initial setup for 60sec) then reverts to the new user setup if that fails. however, fail2ban was still kicking in. Since this was really just in to prevent bootstrapping from failing, I added a wait function in ansible.
 
+- The only thing with this now (i.e. good enough for this project) is it does try one as root while running the playbook, which means on subsequent runs it will show an ERROR, however it then switches to the user and continues with that. Ansible counts it as unreachable instead of failed.
+
 ## GitHub Actions Flow
 
 This repository uses a simple GitHub Actions pipeline to provision and configure the server in ordered stages:
